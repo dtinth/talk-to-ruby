@@ -1,0 +1,14 @@
+{
+  "name": "pipe",
+  "version": "0.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/dtinth/pipe.git",
+  "author": "dtinth <dtinth@spacet.me>",
+  "license": "MIT",
+  "devDependencies": {
+    "tailwindcss": "^3.0.7"
+  },
+  "scripts": {
+    "dev": "tailwindcss -i ./public/style.src.css -o ./public/style.css --watch"
+  }
+}

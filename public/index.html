@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Talk to Ruby</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="vendor/rec-mono-casual/stylesheet.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Recursive&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-200">
+    <div class="mx-auto w-[640px] font-mono py-4">
+      <div
+        id="loading"
+        class="font-sans text-4xl mt-8 text-center text-gray-600"
+      >
+        (Loading)
+      </div>
+      <div id="transcript" class="hidden">
+        <div class="flex mt-2">
+          <div
+            class="
+              bg-white
+              p-3
+              rounded-xl
+              shadow-md
+              font-sans
+              border border-gray-400
+              hidden
+            "
+          >
+            <h1>
+              Hi,
+              <a class="text-blue-700" href="https://opalrb.com/">Opal</a> here.
+              Talk to me in
+              <a class="text-blue-700" href="https://www.ruby-lang.org/en/"
+                >Ruby</a
+              >.
+            </h1>
+          </div>
+        </div>
+      </div>
+      <form class="mt-3 pt-3 pl-12 hidden" id="form">
+        <textarea
+          class="
+            bg-white
+            w-full
+            shadow-md
+            p-3
+            border border-gray-400
+            rounded-xl
+          "
+          id="code"
+        ></textarea>
+      </form>
+    </div>
+    <script src="https://cdn.opalrb.com/opal/current/opal.js"></script>
+    <script
+      src="https://cdn.opalrb.com/opal/current/date.js"
+      onload="Opal.load('date')"
+    ></script>
+    <script
+      src="https://cdn.opalrb.com/opal/current/opal-parser.js"
+      onload="Opal.load('opal-parser')"
+    ></script>
+    <script>
+      const code = document.querySelector('#code')
+      const form = document.querySelector('#form')
+      const transcript = document.querySelector('#transcript')
+      const inspect = Opal.eval('-> { _1.inspect }')
+      function add(mine, text, error) {
+        const el = document.createElement('div')
+        const tag = 'button'
+        el.className = `flex mt-2 ${mine ? 'flex-row-reverse' : 'flex-row'}`
+        el.innerHTML = `<${tag} class="${
+          mine
+            ? 'bg-green-200 border-green-400'
+            : error
+            ? 'bg-red-100 border-red-400 text-red-700'
+            : 'bg-white border-gray-400'
+        } border p-3 rounded-xl shadow-md js-text"></${tag}>`
+        el.querySelector('.js-text').innerText = text
+        el.querySelector('.js-text').onclick = () => {
+          code.value = text
+          code.focus()
+        }
+        const h = transcript.scrollHeight
+        transcript.appendChild(el)
+        const h2 = transcript.scrollHeight
+        window.scrollBy(0, h2 - h)
+      }
+      function run(value) {
+        add(true, value)
+        try {
+          const jsCode = Opal.compile(value, { irb: true })
+          console.debug(jsCode)
+          const result = eval(jsCode)
+          const str = inspect.$call(result)
+          add(false, str)
+        } catch (error) {
+          console.error(error)
+          add(false, String(error), true)
+        }
+      }
+      const submit = (form.onsubmit = (e) => {
+        if (e) {
+          e.preventDefault()
+        }
+        const value = code.value
+        run(value)
+      })
+      code.onkeydown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          submit(e)
+        }
+      }
+      run('["Hello", "Hey", "Hi"].sample')
+      document.querySelector('#loading').hidden = true
+      document.querySelector('#transcript').classList.remove('hidden')
+      document.querySelector('#form').classList.remove('hidden')
+    </script>
+  </body>
+</html>
