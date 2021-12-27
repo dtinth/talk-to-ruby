@@ -469,6 +469,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   width: 100%;
 }
 
+.max-w-\[640px\] {
+  max-width: 640px;
+}
+
 .flex-row {
   flex-direction: row;
 }
@@ -532,6 +536,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .p-3 {
   padding: 0.75rem;
+}
+
+.p-4 {
+  padding: 1rem;
 }
 
 .py-4 {
