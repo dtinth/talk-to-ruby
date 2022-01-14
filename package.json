@@ -6,9 +6,35 @@
   "author": "dtinth <dtinth@spacet.me>",
   "license": "MIT",
   "devDependencies": {
+    "@codemirror/autocomplete": "^0.19.12",
+    "@codemirror/basic-setup": "^0.19.1",
+    "@codemirror/closebrackets": "^0.19.0",
+    "@codemirror/commands": "^0.19.7",
+    "@codemirror/comment": "^0.19.0",
+    "@codemirror/fold": "^0.19.2",
+    "@codemirror/gutter": "^0.19.9",
+    "@codemirror/highlight": "^0.19.7",
+    "@codemirror/history": "^0.19.2",
+    "@codemirror/language": "^0.19.7",
+    "@codemirror/legacy-modes": "^0.19.0",
+    "@codemirror/lint": "^0.19.3",
+    "@codemirror/matchbrackets": "^0.19.3",
+    "@codemirror/rectangular-selection": "^0.19.1",
+    "@codemirror/search": "^0.19.5",
+    "@codemirror/state": "^0.19.6",
+    "@codemirror/stream-parser": "^0.19.3",
+    "@codemirror/view": "^0.19.39",
+    "parcel": "^2.2.0",
     "tailwindcss": "^3.0.7"
   },
   "scripts": {
     "dev": "tailwindcss -i ./public/style.src.css -o ./public/style.css --watch"
+  },
+  "targets": {
+    "editor": {
+      "source": "src/editor.ts",
+      "distDir": "./public/vendor/editor",
+      "outputFormat": "global"
+    }
   }
 }

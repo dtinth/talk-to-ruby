@@ -25,15 +25,7 @@
       <div id="transcript" class="hidden">
         <div class="flex mt-2">
           <div
-            class="
-              bg-white
-              p-3
-              rounded-xl
-              shadow-md
-              font-sans
-              border border-gray-400
-              hidden
-            "
+            class="bg-white p-3 rounded-xl shadow-md font-sans border border-gray-400 hidden"
           >
             <h1>
               Hi,
@@ -48,14 +40,7 @@
       </div>
       <form class="mt-3 pt-3 pl-12 hidden" id="form">
         <textarea
-          class="
-            bg-white
-            w-full
-            shadow-md
-            p-3
-            border border-gray-400
-            rounded-xl
-          "
+          class="bg-white w-full shadow-md p-3 border border-gray-400 rounded-xl"
           id="code"
         ></textarea>
       </form>
@@ -69,8 +54,82 @@
       src="https://cdn.opalrb.com/opal/current/opal-parser.js"
       onload="Opal.load('opal-parser')"
     ></script>
+    <script src="vendor/editor/editor.js"></script>
     <script>
-      const code = document.querySelector('#code')
+      {
+        const code = document.querySelector('#code')
+        window.codeEditor = {
+          getValue() {
+            return code.value
+          },
+          setValue(value) {
+            code.value = value
+          },
+          focus() {
+            code.focus()
+          },
+          onEnter(f) {
+            code.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' && !e.shiftKey()) {
+                e.preventDefault()
+                f()
+              }
+            })
+          },
+        }
+      }
+    </script>
+    <script>
+      {
+        const { EditorState, EditorView, setup, keymap } = cm
+        const code = document.querySelector('#code')
+        const div = document.createElement('div')
+        div.className = code.className
+        code.parentNode.replaceChild(div, code)
+        const enterKeyHandlers = []
+        const createState = (text) => {
+          const state = EditorState.create({
+            doc: text,
+            extensions: [
+              keymap.of([
+                {
+                  key: 'Enter',
+                  run() {
+                    enterKeyHandlers.forEach((f) => f())
+                    return true
+                  },
+                },
+              ]),
+              setup,
+            ],
+          })
+          return state.update({
+            selection: {
+              anchor: state.doc.length,
+            },
+          }).state
+        }
+        let view = new EditorView({
+          state: createState(''),
+          parent: div,
+        })
+        window.codeEditor = {
+          getValue() {
+            return view.state.doc.toString()
+          },
+          setValue(value) {
+            view.setState(createState(value))
+          },
+          focus() {
+            view.focus()
+          },
+          onEnter(f) {
+            enterKeyHandlers.push(f)
+          },
+        }
+      }
+    </script>
+    <script>
       const form = document.querySelector('#form')
       const transcript = document.querySelector('#transcript')
       const inspect = Opal.eval('-> { _1.inspect }')
@@ -87,8 +146,8 @@
         } border p-3 rounded-xl shadow-md js-text"></${tag}>`
         el.querySelector('.js-text').innerText = text
         el.querySelector('.js-text').onclick = () => {
-          code.value = text
-          code.focus()
+          codeEditor.setValue(text)
+          codeEditor.focus()
         }
         const h = transcript.scrollHeight
         transcript.appendChild(el)
@@ -112,14 +171,12 @@
         if (e) {
           e.preventDefault()
         }
-        const value = code.value
+        const value = codeEditor.getValue()
         run(value)
       })
-      code.onkeydown = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          submit(e)
-        }
-      }
+      codeEditor.onEnter((e) => {
+        submit(e)
+      })
       run('["Hello", "Hey", "Hi"].sample')
       document.querySelector('#loading').hidden = true
       document.querySelector('#transcript').classList.remove('hidden')
